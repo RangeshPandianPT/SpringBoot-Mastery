@@ -1,11 +1,11 @@
 package dev.rangesh.HelloWorld.service;
 
+import dev.rangesh.HelloWorld.exception.ResourceNotFoundException;
 import dev.rangesh.HelloWorld.model.Student;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -24,10 +24,11 @@ public class StudentService {
         return students;
     }
 
-    public Optional<Student> getStudentById(Long id) {
+    public Student getStudentById(Long id) {
         return students.stream()
                 .filter(student -> student.getId().equals(id))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
     }
 
     public Student addStudent(Student student) {
@@ -36,7 +37,15 @@ public class StudentService {
         return student;
     }
 
-    public boolean deleteStudent(Long id) {
-        return students.removeIf(student -> student.getId().equals(id));
+    public Student updateStudent(Long id, Student studentDetails) {
+        Student existingStudent = getStudentById(id);
+        existingStudent.setName(studentDetails.getName());
+        existingStudent.setCourse(studentDetails.getCourse());
+        return existingStudent;
+    }
+
+    public void deleteStudent(Long id) {
+        Student existingStudent = getStudentById(id);
+        students.remove(existingStudent);
     }
 }

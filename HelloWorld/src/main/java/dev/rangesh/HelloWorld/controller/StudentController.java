@@ -1,13 +1,15 @@
 package dev.rangesh.HelloWorld.controller;
 
+import dev.rangesh.HelloWorld.dto.StudentDto;
 import dev.rangesh.HelloWorld.model.Student;
 import dev.rangesh.HelloWorld.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/students")
@@ -21,33 +23,52 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    // Convert Entity to DTO
+    private StudentDto convertToDto(Student student) {
+        return new StudentDto(student.getId(), student.getName(), student.getCourse());
+    }
+
+    // Convert DTO to Entity
+    private Student convertToEntity(StudentDto studentDto) {
+        return new Student(studentDto.getId(), studentDto.getFullName(), studentDto.getEnrolledCourse());
+    }
+
     // GET /api/students
     @GetMapping
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
+    public ResponseEntity<List<StudentDto>> getAllStudents() {
+        List<StudentDto> students = studentService.getAllStudents().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(students);
     }
 
     // GET /api/students/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
-        Optional<Student> student = studentService.getStudentById(id);
-        return student.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long id) {
+        Student student = studentService.getStudentById(id);
+        return ResponseEntity.ok(convertToDto(student));
     }
 
     // POST /api/students
     @PostMapping
-    public Student addStudent(@RequestBody Student student) {
-        return studentService.addStudent(student);
+    public ResponseEntity<StudentDto> addStudent(@RequestBody StudentDto studentDto) {
+        Student student = convertToEntity(studentDto);
+        Student savedStudent = studentService.addStudent(student);
+        return new ResponseEntity<>(convertToDto(savedStudent), HttpStatus.CREATED);
+    }
+
+    // PUT /api/students/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long id, @RequestBody StudentDto studentDto) {
+        Student student = convertToEntity(studentDto);
+        Student updatedStudent = studentService.updateStudent(id, student);
+        return ResponseEntity.ok(convertToDto(updatedStudent));
     }
 
     // DELETE /api/students/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        if (studentService.deleteStudent(id)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        studentService.deleteStudent(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -2,50 +2,44 @@ package dev.rangesh.HelloWorld.service;
 
 import dev.rangesh.HelloWorld.exception.ResourceNotFoundException;
 import dev.rangesh.HelloWorld.model.Student;
+import dev.rangesh.HelloWorld.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class StudentService {
 
-    // Using an in-memory list to simulate a database for basic learning
-    private final List<Student> students = new ArrayList<>();
-    private long idCounter = 1;
+    private final StudentRepository studentRepository;
 
-    public StudentService() {
-        // Add some initial data
-        students.add(new Student(idCounter++, "Alice Smith", "Computer Science"));
-        students.add(new Student(idCounter++, "Bob Johnson", "Mathematics"));
+    @Autowired
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
     public List<Student> getAllStudents() {
-        return students;
+        return studentRepository.findAll();
     }
 
     public Student getStudentById(Long id) {
-        return students.stream()
-                .filter(student -> student.getId().equals(id))
-                .findFirst()
+        return studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
     }
 
     public Student addStudent(Student student) {
-        student.setId(idCounter++);
-        students.add(student);
-        return student;
+        return studentRepository.save(student);
     }
 
     public Student updateStudent(Long id, Student studentDetails) {
         Student existingStudent = getStudentById(id);
         existingStudent.setName(studentDetails.getName());
         existingStudent.setCourse(studentDetails.getCourse());
-        return existingStudent;
+        return studentRepository.save(existingStudent);
     }
 
     public void deleteStudent(Long id) {
         Student existingStudent = getStudentById(id);
-        students.remove(existingStudent);
+        studentRepository.delete(existingStudent);
     }
 }

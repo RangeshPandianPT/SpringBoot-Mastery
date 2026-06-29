@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +53,7 @@ public class StudentController {
 
     // POST /api/students
     @PostMapping
-    public ResponseEntity<StudentDto> addStudent(@RequestBody StudentDto studentDto) {
+    public ResponseEntity<StudentDto> addStudent(@Valid @RequestBody StudentDto studentDto) {
         Student student = convertToEntity(studentDto);
         Student savedStudent = studentService.addStudent(student);
         return new ResponseEntity<>(convertToDto(savedStudent), HttpStatus.CREATED);
@@ -59,7 +61,7 @@ public class StudentController {
 
     // PUT /api/students/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long id, @RequestBody StudentDto studentDto) {
+    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long id, @Valid @RequestBody StudentDto studentDto) {
         Student student = convertToEntity(studentDto);
         Student updatedStudent = studentService.updateStudent(id, student);
         return ResponseEntity.ok(convertToDto(updatedStudent));

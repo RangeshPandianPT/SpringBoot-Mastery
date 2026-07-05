@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -37,10 +40,9 @@ public class StudentController {
 
     // GET /api/students
     @GetMapping
-    public ResponseEntity<List<StudentDto>> getAllStudents() {
-        List<StudentDto> students = studentService.getAllStudents().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+    public ResponseEntity<Page<StudentDto>> getAllStudents(Pageable pageable) {
+        Page<StudentDto> students = studentService.getAllStudents(pageable)
+                .map(this::convertToDto);
         return ResponseEntity.ok(students);
     }
 

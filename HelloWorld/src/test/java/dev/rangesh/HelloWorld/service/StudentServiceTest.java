@@ -27,6 +27,9 @@ public class StudentServiceTest {
     @Mock
     private StudentRepository studentRepository;
 
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private StudentService studentService;
 

@@ -23,7 +23,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import dev.rangesh.HelloWorld.security.JwtUtil;
+import dev.rangesh.HelloWorld.security.CustomUserDetailsService;
+
 @WebMvcTest(StudentController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class StudentControllerTest {
 
     @Autowired
@@ -31,6 +36,12 @@ public class StudentControllerTest {
 
     @MockBean
     private StudentService studentService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

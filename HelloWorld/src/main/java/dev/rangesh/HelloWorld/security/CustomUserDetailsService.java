@@ -5,9 +5,11 @@ import dev.rangesh.HelloWorld.repository.AppUserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
+@Primary
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final AppUserRepository userRepository;

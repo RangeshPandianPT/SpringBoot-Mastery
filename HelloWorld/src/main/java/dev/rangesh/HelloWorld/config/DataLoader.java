@@ -5,14 +5,16 @@ import dev.rangesh.HelloWorld.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import dev.rangesh.HelloWorld.repository.AppUserRepository;
+import dev.rangesh.HelloWorld.model.AppUser;
 
 import java.util.List;
 
-@Configuration
-public class DataLoader {
+    @Configuration
+    public class DataLoader {
 
     @Bean
-    CommandLineRunner initDatabase(StudentRepository repository) {
+    CommandLineRunner initDatabase(StudentRepository repository, AppUserRepository userRepository) {
         return args -> {
             if (repository.count() == 0) {
                 repository.saveAll(List.of(
@@ -23,6 +25,14 @@ public class DataLoader {
                         Student.builder().name("Evan Wright").course("History").build()
                 ));
                 System.out.println("Loaded 5 dummy student records into the database.");
+            }
+            if (userRepository.count() == 0) {
+                userRepository.save(AppUser.builder()
+                        .username("admin")
+                        .password("$2a$10$wY1twJwXwM/1z7C.j8c2sOS6gB3.FmBf4VpWk.4kR27jV.M/57XnC") // "password"
+                        .role("ROLE_ADMIN")
+                        .build());
+                System.out.println("Loaded admin user into the database.");
             }
         };
     }

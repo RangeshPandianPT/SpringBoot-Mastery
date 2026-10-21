@@ -8,13 +8,16 @@ import org.springframework.context.annotation.Configuration;
 import dev.rangesh.HelloWorld.repository.AppUserRepository;
 import dev.rangesh.HelloWorld.model.AppUser;
 
+import dev.rangesh.HelloWorld.model.Course;
+import dev.rangesh.HelloWorld.repository.CourseRepository;
+
 import java.util.List;
 
-    @Configuration
-    public class DataLoader {
+@Configuration
+public class DataLoader {
 
     @Bean
-    CommandLineRunner initDatabase(StudentRepository repository, AppUserRepository userRepository) {
+    CommandLineRunner initDatabase(StudentRepository repository, AppUserRepository userRepository, CourseRepository courseRepository) {
         return args -> {
             if (repository.count() == 0) {
                 repository.saveAll(List.of(
@@ -33,6 +36,15 @@ import java.util.List;
                         .role("ROLE_ADMIN")
                         .build());
                 System.out.println("Loaded admin user into the database.");
+            }
+            if (courseRepository.count() == 0) {
+                courseRepository.saveAll(List.of(
+                        Course.builder().courseCode("CS101").title("Intro to Computer Science").description("Foundational concepts of computing").credits(4).department("Computer Science").build(),
+                        Course.builder().courseCode("MATH201").title("Linear Algebra").description("Vector spaces and matrix calculus").credits(3).department("Mathematics").build(),
+                        Course.builder().courseCode("PHYS101").title("General Physics I").description("Mechanics, waves, and thermodynamics").credits(4).department("Physics").build(),
+                        Course.builder().courseCode("ENG105").title("Academic Writing").description("Critical rhetoric and research methods").credits(3).department("Humanities").build()
+                ));
+                System.out.println("Loaded 4 dummy course records into the database.");
             }
         };
     }

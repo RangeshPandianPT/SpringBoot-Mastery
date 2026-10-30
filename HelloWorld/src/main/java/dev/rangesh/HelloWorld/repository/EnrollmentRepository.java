@@ -1,0 +1,28 @@
+package dev.rangesh.HelloWorld.repository;
+
+import dev.rangesh.HelloWorld.model.Enrollment;
+import dev.rangesh.HelloWorld.model.EnrollmentStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
+
+    Page<Enrollment> findByStatus(EnrollmentStatus status, Pageable pageable);
+
+    List<Enrollment> findByStudentId(Long studentId);
+
+    List<Enrollment> findByCourseId(Long courseId);
+
+    Optional<Enrollment> findByStudentIdAndCourseId(Long studentId, Long courseId);
+
+    boolean existsByStudentIdAndCourseId(Long studentId, Long courseId);
+
+    boolean existsByStudentIdAndCourseIdAndStatus(Long studentId, Long courseId, EnrollmentStatus status);
+}
+

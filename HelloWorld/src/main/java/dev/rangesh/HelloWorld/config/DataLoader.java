@@ -1,23 +1,29 @@
 package dev.rangesh.HelloWorld.config;
 
+import dev.rangesh.HelloWorld.model.AppUser;
+import dev.rangesh.HelloWorld.model.Course;
+import dev.rangesh.HelloWorld.model.Enrollment;
+import dev.rangesh.HelloWorld.model.EnrollmentStatus;
 import dev.rangesh.HelloWorld.model.Student;
+import dev.rangesh.HelloWorld.repository.AppUserRepository;
+import dev.rangesh.HelloWorld.repository.CourseRepository;
+import dev.rangesh.HelloWorld.repository.EnrollmentRepository;
 import dev.rangesh.HelloWorld.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import dev.rangesh.HelloWorld.repository.AppUserRepository;
-import dev.rangesh.HelloWorld.model.AppUser;
 
-import dev.rangesh.HelloWorld.model.Course;
-import dev.rangesh.HelloWorld.repository.CourseRepository;
-
+import java.time.LocalDate;
 import java.util.List;
 
 @Configuration
 public class DataLoader {
 
     @Bean
-    CommandLineRunner initDatabase(StudentRepository repository, AppUserRepository userRepository, CourseRepository courseRepository) {
+    CommandLineRunner initDatabase(StudentRepository repository,
+                                  AppUserRepository userRepository,
+                                  CourseRepository courseRepository,
+                                  EnrollmentRepository enrollmentRepository) {
         return args -> {
             if (repository.count() == 0) {
                 repository.saveAll(List.of(
@@ -45,6 +51,34 @@ public class DataLoader {
                         Course.builder().courseCode("ENG105").title("Academic Writing").description("Critical rhetoric and research methods").credits(3).department("Humanities").build()
                 ));
                 System.out.println("Loaded 4 dummy course records into the database.");
+            }
+            if (enrollmentRepository.count() == 0 && repository.count() > 0 && courseRepository.count() > 0) {
+                List<Student> students = repository.findAll();
+                List<Course> courses = courseRepository.findAll();
+                enrollmentRepository.saveAll(List.of(
+                        Enrollment.builder()
+                                .student(students.get(0))
+                                .course(courses.get(0))
+                                .status(EnrollmentStatus.ENROLLED)
+                                .enrollmentDate(LocalDate.now().minusMonths(1))
+                                .grade(null)
+                                .build(),
+                        Enrollment.builder()
+                                .student(students.get(0))
+                                .course(courses.get(1))
+                                .status(EnrollmentStatus.COMPLETED)
+                                .enrollmentDate(LocalDate.now().minusMonths(6))
+                                .grade("A")
+                                .build(),
+                        Enrollment.builder()
+                                .student(students.get(1))
+                                .course(courses.get(0))
+                                .status(EnrollmentStatus.ENROLLED)
+                                .enrollmentDate(LocalDate.now().minusWeeks(2))
+                                .grade(null)
+                                .build()
+                ));
+                System.out.println("Loaded 3 dummy enrollment records into the database.");
             }
         };
     }
